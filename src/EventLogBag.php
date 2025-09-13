@@ -2,13 +2,13 @@
 
 namespace Spatie\Activitylog;
 
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 
 class EventLogBag
 {
     public function __construct(
         public string $event,
-        public Model $model,
+        public object $model,
         public array $changes,
         public ?LogOptions $options = null
     ) {

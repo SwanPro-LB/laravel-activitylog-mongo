@@ -5,7 +5,7 @@ namespace Spatie\Activitylog;
 use Closure;
 use DateTimeInterface;
 use Illuminate\Contracts\Config\Repository;
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Conditionable;
@@ -45,7 +45,7 @@ class ActivityLogger
         return $this;
     }
 
-    public function performedOn(Model $model): static
+    public function performedOn($model): static
     {
         $this->getActivity()->subject()->associate($model);
 
@@ -57,8 +57,9 @@ class ActivityLogger
         return $this->performedOn($model);
     }
 
-    public function causedBy(Model | int | string | null $modelOrId): static
+    public function causedBy($modelOrId)
     {
+        return $modelOrId->id;
         if ($modelOrId === null) {
             return $this;
         }
@@ -70,7 +71,7 @@ class ActivityLogger
         return $this;
     }
 
-    public function by(Model | int | string | null $modelOrId): static
+    public function by($modelOrId): static
     {
         return $this->causedBy($modelOrId);
     }
@@ -161,6 +162,12 @@ class ActivityLogger
         }
 
         $activity = $this->activity;
+        $activity->ip_address = request()->ip();
+        $activity->url = request()->path();
+        $activity->activity_group = session()->get('activity_group');
+        $activity->tenancy = session()->get('tenant_id');
+        $activity->user_id = \Auth::user()->id;
+        $activity->user_name = \Auth::user()->user_name;
 
         $activity->description = $this->replacePlaceholders(
             $activity->description ?? $description,

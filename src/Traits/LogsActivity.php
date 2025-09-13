@@ -4,9 +4,9 @@ namespace Spatie\Activitylog\Traits;
 
 use Carbon\CarbonInterval;
 use DateInterval;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use MongoDB\Laravel\Eloquent\Model;
+use MongoDB\Laravel\Relations\MorphMany;
+use MongoDB\Laravel\Eloquent\SoftDeletes;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -38,13 +38,13 @@ trait LogsActivity
 
         static::eventsToBeRecorded()->each(function ($eventName) {
             if ($eventName === 'updated') {
-                static::updating(function (Model $model) {
+                static::updating(function ($model) {
                     $oldValues = (new static())->setRawAttributes($model->getRawOriginal());
                     $model->oldAttributes = static::logChanges($oldValues);
                 });
             }
 
-            static::$eventName(function (Model $model) use ($eventName) {
+            static::$eventName(function ($model) use ($eventName) {
                 $model->activitylogOptions = $model->getActivitylogOptions();
 
                 if (! $model->shouldLogEvent($eventName)) {
@@ -327,7 +327,7 @@ trait LogsActivity
         return $properties;
     }
 
-    public static function logChanges(Model $model): array
+    public static function logChanges($model): array
     {
         $changes = [];
         $attributes = $model->attributesToBeLogged();

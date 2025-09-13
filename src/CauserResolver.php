@@ -5,7 +5,7 @@ namespace Spatie\Activitylog;
 use Closure;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Contracts\Config\Repository;
-use Illuminate\Database\Eloquent\Model;
+use MongoDB\Laravel\Eloquent\Model;
 use Spatie\Activitylog\Exceptions\CouldNotLogActivity;
 
 class CauserResolver
@@ -25,7 +25,7 @@ class CauserResolver
         $this->authDriver = $config['activitylog']['default_auth_driver'];
     }
 
-    public function resolve(Model | int | string | null $subject = null): ?Model
+    public function resolve(Model | int | string | null $subject = null)
     {
         if ($this->causerOverride !== null) {
             return $this->causerOverride;
@@ -56,7 +56,7 @@ class CauserResolver
         return $model;
     }
 
-    protected function getCauser(Model | int | string | null $subject = null): ?Model
+    protected function getCauser(Model | int | string | null $subject = null)
     {
         if ($subject instanceof Model) {
             return $subject;
@@ -94,7 +94,7 @@ class CauserResolver
         return $model instanceof Model || is_null($model);
     }
 
-    protected function getDefaultCauser(): ?Model
+    protected function getDefaultCauser()
     {
         return $this->authManager->guard($this->authDriver)->user();
     }
