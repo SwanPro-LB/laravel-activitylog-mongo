@@ -59,10 +59,10 @@ class ActivityLogger
 
     public function causedBy($modelOrId)
     {
-        return $modelOrId->id;
         if ($modelOrId === null) {
             return $this;
         }
+        return $modelOrId->id;
 
         $model = $this->causerResolver->resolve($modelOrId);
 
